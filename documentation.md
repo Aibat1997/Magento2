@@ -7,7 +7,7 @@
 
 ### 1. Регистрация модуля:
 
-#### 1.1 Создаем файл `Module_Name/etc/module.xml` с содержимым:
+<h4 id="module-config">1.1 Создаем файл `Module_Name/etc/module.xml` с содержимым:</h4>
 
 ```xml
 <?xml version="1.0"?>
@@ -66,16 +66,124 @@ Cсылка делится на три составных элемента:
 
 router `id` -     
 route `frontName` - название роута в адресной строке;     
-route `id` -    
+route `id` - идентификатор роута(применяется в [шаблоне](#321-создадим-layout-файл-в-modulenameviewfrontendlayouthelloworldindexindexxml-с-содержимым));   
 module `name` - название модуля;
 
 ### 3. MVC
 
 #### 3.1 Model
 
+В Magento2 модель разделена на три части, это:
++ **ResourceModel** - для совершения действий с базой данных (CRUD);
++ **Model** - содержит бизнес-логику модели;
++ **Collection** - для фильтрования и сортировки данных модели;
+
+<h5 id="resource-model">3.1.1 Создадим модель ресурсов в `ModuleName/Model/ResourceModel/ResourceModelName.php` с содержимым:</h5>
+
+```php
+<?php
+
+namespace Vendor\ModuleName\Model\ResourceModel;
+
+class ResourceModelName extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+{
+	
+	public function __construct(
+		\Magento\Framework\Model\ResourceModel\Db\Context $context
+	)
+	{
+		parent::__construct($context);
+	}
+	
+	protected function _construct()
+	{
+		$this->_init('vendor_modulename_tablename', 'pk_id');
+	}
+	
+}
+```
+
+> Все фактические операции с базой данных выполняются моделью ресурсов. Каждая модель должна иметь модель ресурсов.
+
+<h5 id="model">3.1.2 Создадим модель в `ModuleName/Model/ModelName.php` с содержимым:</h5>
+
+```php
+<?php
+
+namespace Vendor\ModuleName\Model;
+
+class ModelName extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
+{
+	const CACHE_TAG = 'vendor_modulename_tablename';
+
+	protected $_cacheTag = 'vendor_modulename_tablename';
+
+	protected $_eventPrefix = 'vendor_modulename_tablename';
+
+	protected function _construct()
+	{
+		$this->_init('Vendor\ModuleName\Model\ResourceModel\ResourceModelName');
+	}
+
+	public function getIdentities()
+	{
+		return [self::CACHE_TAG . '_' . $this->getId()];
+	}
+
+	public function getDefaultValues()
+	{
+		$values = [];
+
+		return $values;
+	}
+}
+```
+
+>  метод _init() определяет [модель ресурсов](#resource-model), которая фактически будет извлекать информацию из базы данных.
+
+##### 3.1.3 Создадим модель коллекции в `ModuleName/Model/ResourceModel/ModelName/Collection.php` с содержимым:
+
+```php
+<?php
+
+namespace Vendor\ModuleName\Model\ResourceModel\ModelName;
+
+class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
+{
+	protected $_idFieldName = 'pk_id';
+	protected $_eventPrefix = 'vendor_modulename_tablename_collection';
+	protected $_eventObject = 'modelname_collection';
+
+	/**
+	 * Define resource model
+	 *
+	 * @return void
+	 */
+	protected function _construct()
+	{
+		$this->_init('Vendor\ModuleName\Model\ModelName', 'Vendor\ModuleName\Model\ResourceModel\ResourceModelName');
+	}
+
+}
+```
+
+>  метод _init() определяет [модель](#model) и [модель ресурсов](#resource-model)
+
 #### 3.2 View
 
+Состоит из трех компонентов (подробнее [здесь](https://devdocs.magento.com/guides/v2.3/frontend-dev-guide/layouts/layout-overview.html))
++ Layouts - описывает структуру веб-страницы;
++ Containers - секции для заполнения контентом;
++ Blocks - элементы пользовательского интерфейса на странице. 
+
 ##### 3.2.1 Создадим layout файл в `ModuleName/view/frontend/layout/helloworld_index_index.xml` с содержимым:
+
+> структура расоложения шаблона `module_name`/view/`area`/layout, где:
+> + `area` - может быть **frontend**(область пользователя) или **adminhtml**(область админ панели);  
+
+> название layout-a состоит из `routerId`_`controllerName`_layoutName.xml, где:
+> + `routerId` - [id](#21-регистрация-роута) роута;
+> + `controllerName` - название контроллера;
 
 ```xml
 <?xml version="1.0"?>
@@ -116,20 +224,28 @@ namespace Vendor\ModuleName\Controller\ControllerName;
 
 class Action extends \Magento\Framework\App\Action\Action
 {
-    protected $_pageFactory;
+    protected $_pageFactory; //для шаблона
+	protected $_modelnameFactory; //для модели
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $pageFactory
+        \Magento\Framework\View\Result\PageFactory $pageFactory,
+		\Vendor\ModuleName\Model\ModelNameFactory $modelnameFactory
     ) {
         $this->_pageFactory = $pageFactory;
+		$this->_modelnameFactory = $modelnameFactory;
         return parent::__construct($context);
     }
 
     public function execute()
     {
         //ваш код
-        return $this->_pageFactory->create(); //для шаблона (view)
+
+		//для модели
+		//$model = $this->_modelnameFactory->create();
+		//$collection = $model->getCollection();
+
+        //return $this->_pageFactory->create(); //для шаблона (view)
     }
 }
 ```
@@ -236,8 +352,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
 }
 ```
 
-> тут идет сравнение c прошлой версией модуля
+> тут идет сравнение c прошлой [версией модуля](#module-config)
 
 >  При каждом обновлений структуры базы данных нужно запускать команду `php bin/magento setup:upgrade`
-
-
