@@ -7,7 +7,7 @@
 
 ### 1. Регистрация модуля:
 
-<h4 id="module-config">1.1 Создаем файл `Module_Name/etc/module.xml` с содержимым:</h4>
+<h4 id="module-config">1.1 Создаем файл <code>Module_Name/etc/module.xml</code> с содержимым:</h4>
 
 ```xml
 <?xml version="1.0"?>
@@ -51,13 +51,13 @@ Cсылка делится на три составных элемента:
 
 #### 2.1 Регистрация роута:  
 
-##### 2.1.1 Создаем файл `Module_Name/etc/frontend/routes.xml` с содержимым:
+<h5 id="create-route">2.1.1 Создаем файл <code>Module_Name/etc/frontend/routes.xml</code> с содержимым:</h5>
 
 ```xml
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
     <router id="standard">
-        <route frontName="helloworld" id="helloworld">
+        <route frontName="linkName" id="routeIdName">
             <module name="Vendor_ModuleName"/>
         </route>
     </router>
@@ -66,7 +66,7 @@ Cсылка делится на три составных элемента:
 
 router `id` -     
 route `frontName` - название роута в адресной строке;     
-route `id` - идентификатор роута(применяется в [шаблоне](#321-создадим-layout-файл-в-modulenameviewfrontendlayouthelloworldindexindexxml-с-содержимым));   
+route `id` - идентификатор роута(применяется в [шаблоне](#create-layout));   
 module `name` - название модуля;
 
 ### 3. MVC
@@ -78,7 +78,7 @@ module `name` - название модуля;
 + **Model** - содержит бизнес-логику модели;
 + **Collection** - для фильтрования и сортировки данных модели;
 
-<h5 id="resource-model">3.1.1 Создадим модель ресурсов в `ModuleName/Model/ResourceModel/ResourceModelName.php` с содержимым:</h5>
+<h5 id="resource-model">3.1.1 Создадим модель ресурсов в <code>ModuleName/Model/ResourceModel/ResourceModelName.php</code> с содержимым:</h5>
 
 ```php
 <?php
@@ -105,7 +105,7 @@ class ResourceModelName extends \Magento\Framework\Model\ResourceModel\Db\Abstra
 
 > Все фактические операции с базой данных выполняются моделью ресурсов. Каждая модель должна иметь модель ресурсов.
 
-<h5 id="model">3.1.2 Создадим модель в `ModuleName/Model/ModelName.php` с содержимым:</h5>
+<h5 id="model">3.1.2 Создадим модель в <code>ModuleName/Model/ModelName.php</code> с содержимым:</h5>
 
 ```php
 <?php
@@ -176,41 +176,164 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
 + Containers - секции для заполнения контентом;
 + Blocks - элементы пользовательского интерфейса на странице. 
 
-##### 3.2.1 Создадим layout файл в `ModuleName/view/frontend/layout/helloworld_index_index.xml` с содержимым:
+<h5 id="create-layout">3.2.1 Создадим макет страницы в <code>ModuleName/view/area/layout/helloworld_index_index.xml</code> с содержимым:</h5>
 
-> структура расоложения шаблона `module_name`/view/`area`/layout, где:
+> структура расположения макета `module_name`/view/`area`/layout, где:
 > + `area` - может быть **frontend**(область пользователя) или **adminhtml**(область админ панели);  
 
-> название layout-a состоит из `routerId`_`controllerName`_layoutName.xml, где:
-> + `routerId` - [id](#21-регистрация-роута) роута;
-> + `controllerName` - название контроллера;
+> название макетa состоит из `routerId`_`controllerName`_layoutName.xml, где:
+> + `routerId` - [id](#create-route) роута;
 
 ```xml
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <referenceContainer name="content">
-        <block class="Vendor\ModuleName\Block\BlockName" name="helloworld_index_index" template="Vendor_ModuleName::index.phtml" />
+        <block class="Vendor\ModuleName\Block\BlockName" name="moduleName_blockName" template="Vendor_ModuleName::templateName.phtml" />
     </referenceContainer>
 </page>
 ```
 
-##### 3.2.2 Создадим блок файл в `ModuleName/Block/BlockName.php` с содержимым: 
+> block `class` - путь к классу [блока](#create-block);  
+> block `name` - идентификатор блока;  
+> block `template` - название [шаблона](#create-template);
+
+<h5 id="create-block">3.2.2 Создадим блок файл в <code>ModuleName/Block/BlockName.php</code> с содержимым:</h5> 
 
 ```php
 <?php
 
-namespace Mageplaza\HelloWorld\Block;
+namespace Vendor\ModuleName\Block;
 
 class BlockName extends \Magento\Framework\View\Element\Template
 {
+	protected $_modelnameFactory;
 
+	public function __construct(
+		\Magento\Framework\View\Element\Template\Context $context,
+		\Vendor\ModuleName\Model\ModelNameFactory $modelnameFactory
+	) {
+		$this->_modelnameFactory = $modelnameFactory;
+		parent::__construct($context);
+	}
+
+	public function getModelCollection()
+	{
+		$modelData = $this->_modelnameFactory->create();
+		return $modelData->getCollection();
+	}
 }
 ```
 
-##### 3.2.3 Создадим файл шаблона в `ModuleName/view/frontend/templates/index.phtml` с содержимым: 
+<h5 id="create-template">3.2.3 Создадим файл шаблона в <code>ModuleName/view/area/templates/templateName.phtml</code> с содержимым:</h5>
 
-```html
-<h2>Welcome to Mageplaza.com</h2>
+```php
+<ul>
+	<?php
+		foreach ($block->getModelCollection() as $key=>$item){
+			echo $item;
+		}
+	?>
+</ul>
+```
+
+ > $block - переменная для использования данных с класса [блока](#create-block);
+
+##### 3.2.4 Админ панель
+
+###### 3.2.4.1 Меню
+создадим `ModuleName/etc/adminhtml/menu.xml` с содержимым:
+
+```xml
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Vendor_ModuleName::parentId" title="parent title" module="Vendor_ModuleName" sortOrder="51" resource="Vendor_ModuleName::aclFirstRule"/>
+        <add id="Vendor_ModuleName::post" title="child title" module="Vendor_ModuleName" sortOrder="10" action="vendor_moduleName/post" resource="Vendor_ModuleName::aclSecondRule" parent="Vendor_ModuleName::parentId"/>
+    </menu>
+</config>
+```
+
+> id — идентификатор меню (в формате: {Vendor_ModuleName}::{menu_description});   
+title — это текст, который будет отображаться в строке меню;  
+module — определяет модуль, которому принадлежит это меню;  
+sortOrder — определяет положение меню. Нижнее значение будет отображаться в верхней части меню;  
+parent — привязка к родительскому меню по его id;  
+action — определять URL-адрес страницы, на которую ссылается это меню.  
+resource — [правила доступа](#acl) (в формате: {Vendor_ModuleName}::{rule});
+
+<figure>
+	<img src="images/admin-menu.png" height="500">
+</figure>
+
+###### 3.2.4.2 Конфигурации
+
+<figure>
+	<img src="images/configuration.png">
+</figure>
+
+создадим `ModuleName/etc/adminhtml/system.xml` с содержимым:
+
+```xml
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="tabId" translate="label" sortOrder="10">
+            <label>Tab Name</label>
+        </tab>
+        <section id="sectionId" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Section Name</label>
+            <tab>tabId</tab>
+            <resource>Vendor_ModuleName::aclRule</resource>
+            <group id="groupId" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Group Name</label>
+                <field id="fieldId" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>field title</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="fieldId2" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>field title</label>
+                    <comment>This text will display on the frontend.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
+```
+
+**Теги:**
+> class - это значение будет добавлено как класс этого элемента;  
+resource - [права](#acl) которые должен иметь пользователь;
+
+**Атрибуты:**
+> `id` - идентификатор  элемента;  
+`translate` - какой элемент нужно перевести;  
+`sortOrder` - сортировка;  
+`showInDefault/showInWebsite/showInStore` - будет ли этот элемент отображаться в каждой области видимости или нет;  
+`type` - аналогичный тип в **input** (text, number, ...);
+
+**Установить значение по умолчанию:**
+
+создадим файл конфигурации `ModuleName/etc/config.xml` с содержимым:
+
+```xml
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <sectionId>
+            <groupId>
+                <fieldId>1</fieldId>
+                <fieldId2>Hello World</fieldId2>
+            </groupId>
+        </sectionId>
+    </default>
+</config>
+```
+
+**Получить значения конфигурации:**
+
+```php
+$this->scopeConfig->getValue('sectionId/groupId/fieldId', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 ```
 
 #### 3.3 Controller
@@ -242,8 +365,8 @@ class Action extends \Magento\Framework\App\Action\Action
         //ваш код
 
 		//для модели
-		//$model = $this->_modelnameFactory->create();
-		//$collection = $model->getCollection();
+		//$modelData = $this->_modelnameFactory->create();
+		//$collection = $modelData->getCollection();
 
         //return $this->_pageFactory->create(); //для шаблона (view)
     }
@@ -355,3 +478,27 @@ class UpgradeSchema implements UpgradeSchemaInterface
 > тут идет сравнение c прошлой [версией модуля](#module-config)
 
 >  При каждом обновлений структуры базы данных нужно запускать команду `php bin/magento setup:upgrade`
+
+<h3 id="acl">5. Admin ACL (Access Control Lists - Списки контроля доступа)</h3>
+
+#### 5.1 создадим `ModuleName/etc/acl.xml` с содержимым:
+
+```xml
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Vendor_ModuleName::aclId" title="main title" sortOrder="51">
+                    <resource id="Vendor_ModuleName::aclFirstRule" title="first title" sortOrder="10"/>
+                    <resource id="Vendor_ModuleName::aclSecondRule" title="second title" sortOrder="99" />
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>
+```
+
+<figure>
+	<img src="images/acl.png" height="500">
+</figure>
