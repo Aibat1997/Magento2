@@ -1,13 +1,42 @@
+# Документация по программированию на Magento2
+
+## Содержание
+
+1 - [Регистрация модуля](#module-registration)
+2 - [Роутинг](#routing)
+3 - [MVC](#mvc)
+
+* 3.1 - [Model](#model-in-mvc)
+  * 3.1.1 - [Модель ресурсов](#resource-model)
+  * 3.1.2 - [Модель](#model)
+  * 3.1.3 - [Модель коллекции](#model-collection)
+* 3.2 - [View](#view)
+  * 3.2.1 - [Макет](#create-layout)
+  * 3.2.2 - [Блок](#create-block)
+  * 3.2.3 - [Шаблон](#create-template)
+  * 3.2.4 - [Админ панель](#admin-panel)
+* 3.3 - [Controller](#controller)
+
+4 - [Действия с Базой Данных](#db-actions)
+
+* 4.1 - [Создание таблицы](#db-create-table)
+* 4.2 - [Изменение структуры таблицы](#db-edit-table)
+
+5 - [Admin ACL (Access Control Lists - Списки контроля доступа)](#acl)
+
+---
+
 **Корневая директория:** `project_directory/app/code`
 
-#### Структура папок:
-`app/code/Vendor` — название поставщика/разработчика (например: Astrio). 
+### Структура папок
+
+`app/code/Vendor` — название поставщика/разработчика (например: Astrio).
 `app/code/Vendor/Module_Name` — название модуля.  
 `app/code/Vendor/Module_Name/etc` — содержит файлы конфигурации.
 
-### 1. Регистрация модуля:
+## 1. Регистрация модуля {#module-registration}
 
-<h4 id="module-config">1.1 Создаем файл <code>Module_Name/etc/module.xml</code> с содержимым:</h4>
+### 1.1 Создаем файл `Module_Name/etc/module.xml` с содержимым: {#module-config}
 
 ```xml
 <?xml version="1.0"?>
@@ -19,7 +48,7 @@
 `name` - это название производителя_название модуля;  
 `setup_version` - версия модуля;  
 
-#### 1.2 Создаем файл `Module_Name/registration.php` с содержимым:
+### 1.2 Создаем файл `Module_Name/registration.php` с содержимым
 
 ```php
 <?php
@@ -32,26 +61,30 @@
 
 > Заменяем Vendor_ModuleName на нужное нам название (название производителя_название модуля).
 
-#### 1.3 Запускаем модуль:
-+ Проверяем корректно ли был создан модуль, запускаем команду:  
+### 1.3 Запускаем модуль {#run-module}
+
+* Проверяем корректно ли был создан модуль, запускаем команду:  
 `php bin/magento module:status`
-> Модуль должен быть в списке отключенных модулей 
-+ Включим наш модуль:   
+
+> Модуль должен быть в списке отключенных модулей
+
+* Включим наш модуль:
 `php bin/magento module:enable Vendor_Module`
-+ Обновим структуры базы данных:    
+* Обновим структуры базы данных:
 `php bin/magento setup:upgrade`
 
-### 2. Роутинг:
+## 2. Роутинг {#routing}
+
 Cсылка делится на три составных элемента:  
 `http://magento2.com/route_name/controller/action`  
 
-`route_name` - название роута (в **routes.xml**);  
-`controller` - папка в каталоге **Controller**;   
-`action` - php класс с методом **execute**;   
+`route_name` - название роута ([frontName](#register-route) в **routes.xml**);  
+`controller` - папка в каталоге **Controller**;
+`action` - php класс с методом **execute**;
 
-#### 2.1 Регистрация роута:  
+### 2.1 Регистрация роута {#register-route}  
 
-<h5 id="create-route">2.1.1 Создаем файл <code>Module_Name/etc/frontend/routes.xml</code> с содержимым:</h5>
+#### 2.1.1 Создаем файл `Module_Name/etc/frontend/routes.xml` с содержимым: {#create-route}
 
 ```xml
 <?xml version="1.0" ?>
@@ -64,21 +97,22 @@ Cсылка делится на три составных элемента:
 </config>
 ```
 
-router `id` -     
-route `frontName` - название роута в адресной строке;     
-route `id` - идентификатор роута(применяется в [шаблоне](#create-layout));   
+router `id` -
+route `frontName` - название роута в адресной строке;
+route `id` - идентификатор роута(применяется в [шаблоне](#create-layout));
 module `name` - название модуля;
 
-### 3. MVC
+## 3. MVC {#mvc}
 
-#### 3.1 Model
+### 3.1 Model {#model-in-mvc}
 
 В Magento2 модель разделена на три части, это:
-+ **ResourceModel** - для совершения действий с базой данных (CRUD);
-+ **Model** - содержит бизнес-логику модели;
-+ **Collection** - для фильтрования и сортировки данных модели;
 
-<h5 id="resource-model">3.1.1 Создадим модель ресурсов в <code>ModuleName/Model/ResourceModel/ResourceModelName.php</code> с содержимым:</h5>
+* **ResourceModel** - для совершения действий с базой данных (CRUD);
+* **Model** - содержит бизнес-логику модели;
+* **Collection** - для фильтрования и сортировки данных модели;
+
+#### 3.1.1 Создадим модель ресурсов в `ModuleName/Model/ResourceModel/ResourceModelName.php` с содержимым: {#resource-model}
 
 ```php
 <?php
@@ -87,25 +121,25 @@ namespace Vendor\ModuleName\Model\ResourceModel;
 
 class ResourceModelName extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
-	
-	public function __construct(
-		\Magento\Framework\Model\ResourceModel\Db\Context $context
-	)
-	{
-		parent::__construct($context);
-	}
-	
-	protected function _construct()
-	{
-		$this->_init('vendor_modulename_tablename', 'pk_id');
-	}
-	
+ 
+ public function __construct(
+  \Magento\Framework\Model\ResourceModel\Db\Context $context
+ )
+ {
+  parent::__construct($context);
+ }
+ 
+ protected function _construct()
+ {
+  $this->_init('vendor_modulename_tablename', 'pk_id');
+ }
+ 
 }
 ```
 
 > Все фактические операции с базой данных выполняются моделью ресурсов. Каждая модель должна иметь модель ресурсов.
 
-<h5 id="model">3.1.2 Создадим модель в <code>ModuleName/Model/ModelName.php</code> с содержимым:</h5>
+#### 3.1.2 Создадим модель в `ModuleName/Model/ModelName.php` с содержимым: {#model}
 
 ```php
 <?php
@@ -114,34 +148,34 @@ namespace Vendor\ModuleName\Model;
 
 class ModelName extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
 {
-	const CACHE_TAG = 'vendor_modulename_tablename';
+ const CACHE_TAG = 'vendor_modulename_tablename';
 
-	protected $_cacheTag = 'vendor_modulename_tablename';
+ protected $_cacheTag = 'vendor_modulename_tablename';
 
-	protected $_eventPrefix = 'vendor_modulename_tablename';
+ protected $_eventPrefix = 'vendor_modulename_tablename';
 
-	protected function _construct()
-	{
-		$this->_init('Vendor\ModuleName\Model\ResourceModel\ResourceModelName');
-	}
+ protected function _construct()
+ {
+  $this->_init('Vendor\ModuleName\Model\ResourceModel\ResourceModelName');
+ }
 
-	public function getIdentities()
-	{
-		return [self::CACHE_TAG . '_' . $this->getId()];
-	}
+ public function getIdentities()
+ {
+  return [self::CACHE_TAG . '_' . $this->getId()];
+ }
 
-	public function getDefaultValues()
-	{
-		$values = [];
+ public function getDefaultValues()
+ {
+  $values = [];
 
-		return $values;
-	}
+  return $values;
+ }
 }
 ```
 
->  метод _init() определяет [модель ресурсов](#resource-model), которая фактически будет извлекать информацию из базы данных.
+> метод _init() определяет [модель ресурсов](#resource-model), которая фактически будет извлекать информацию из базы данных.
 
-##### 3.1.3 Создадим модель коллекции в `ModuleName/Model/ResourceModel/ModelName/Collection.php` с содержимым:
+#### 3.1.3 Создадим модель коллекции в `ModuleName/Model/ResourceModel/ModelName/Collection.php` с содержимым {#model-collection}
 
 ```php
 <?php
@@ -150,39 +184,42 @@ namespace Vendor\ModuleName\Model\ResourceModel\ModelName;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
-	protected $_idFieldName = 'pk_id';
-	protected $_eventPrefix = 'vendor_modulename_tablename_collection';
-	protected $_eventObject = 'modelname_collection';
+ protected $_idFieldName = 'pk_id';
+ protected $_eventPrefix = 'vendor_modulename_tablename_collection';
+ protected $_eventObject = 'modelname_collection';
 
-	/**
-	 * Define resource model
-	 *
-	 * @return void
-	 */
-	protected function _construct()
-	{
-		$this->_init('Vendor\ModuleName\Model\ModelName', 'Vendor\ModuleName\Model\ResourceModel\ResourceModelName');
-	}
+ /**
+  * Define resource model
+  *
+  * @return void
+  */
+ protected function _construct()
+ {
+  $this->_init('Vendor\ModuleName\Model\ModelName', 'Vendor\ModuleName\Model\ResourceModel\ResourceModelName');
+ }
 
 }
 ```
 
->  метод _init() определяет [модель](#model) и [модель ресурсов](#resource-model)
+> метод _init() определяет [модель](#model) и [модель ресурсов](#resource-model)
 
-#### 3.2 View
+### 3.2 View {#view}
 
 Состоит из трех компонентов (подробнее [здесь](https://devdocs.magento.com/guides/v2.3/frontend-dev-guide/layouts/layout-overview.html))
-+ Layouts - описывает структуру веб-страницы;
-+ Containers - секции для заполнения контентом;
-+ Blocks - элементы пользовательского интерфейса на странице. 
 
-<h5 id="create-layout">3.2.1 Создадим макет страницы в <code>ModuleName/view/area/layout/helloworld_index_index.xml</code> с содержимым:</h5>
+* Layouts - описывает структуру веб-страницы;
+* Containers - секции для заполнения контентом;
+* Blocks - элементы пользовательского интерфейса на странице.
+
+#### 3.2.1 Создадим макет страницы в `ModuleName/view/area/layout/helloworld_index_index.xml` с содержимым: {#create-layout}
 
 > структура расположения макета `module_name`/view/`area`/layout, где:
-> + `area` - может быть **frontend**(область пользователя) или **adminhtml**(область админ панели);  
+>
+> * `area` - может быть **frontend**(область пользователя) или **adminhtml**(область админ панели);  
 
 > название макетa состоит из `routerId`_`controllerName`_layoutName.xml, где:
-> + `routerId` - [id](#create-route) роута;
+>
+> * `routerId` - [id](#create-route) роута;
 
 ```xml
 <?xml version="1.0"?>
@@ -197,7 +234,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
 > block `name` - идентификатор блока;  
 > block `template` - название [шаблона](#create-template);
 
-<h5 id="create-block">3.2.2 Создадим блок файл в <code>ModuleName/Block/BlockName.php</code> с содержимым:</h5> 
+#### 3.2.2 Создадим блок файл в `ModuleName/Block/BlockName.php` с содержимым: {#create-block}
 
 ```php
 <?php
@@ -206,41 +243,42 @@ namespace Vendor\ModuleName\Block;
 
 class BlockName extends \Magento\Framework\View\Element\Template
 {
-	protected $_modelnameFactory;
+ protected $_modelnameFactory;
 
-	public function __construct(
-		\Magento\Framework\View\Element\Template\Context $context,
-		\Vendor\ModuleName\Model\ModelNameFactory $modelnameFactory
-	) {
-		$this->_modelnameFactory = $modelnameFactory;
-		parent::__construct($context);
-	}
+ public function __construct(
+  \Magento\Framework\View\Element\Template\Context $context,
+  \Vendor\ModuleName\Model\ModelNameFactory $modelnameFactory
+ ) {
+  $this->_modelnameFactory = $modelnameFactory;
+  parent::__construct($context);
+ }
 
-	public function getModelCollection()
-	{
-		$modelData = $this->_modelnameFactory->create();
-		return $modelData->getCollection();
-	}
+ public function getModelCollection()
+ {
+  $modelData = $this->_modelnameFactory->create();
+  return $modelData->getCollection();
+ }
 }
 ```
 
-<h5 id="create-template">3.2.3 Создадим файл шаблона в <code>ModuleName/view/area/templates/templateName.phtml</code> с содержимым:</h5>
+#### 3.2.3 Создадим файл шаблона в `ModuleName/view/area/templates/templateName.phtml` с содержимым: {#create-template}
 
 ```php
 <ul>
-	<?php
-		foreach ($block->getModelCollection() as $key=>$item){
-			echo $item;
-		}
-	?>
+ <?php
+  foreach ($block->getModelCollection() as $key=>$item){
+   echo $item;
+  }
+ ?>
 </ul>
 ```
 
  > $block - переменная для использования данных с класса [блока](#create-block);
 
-##### 3.2.4 Админ панель
+#### 3.2.4 Админ панель {#admin-panel}
 
-###### 3.2.4.1 Меню
+##### 3.2.4.1 Меню {#admin-view-menu}
+
 создадим `ModuleName/etc/adminhtml/menu.xml` с содержимым:
 
 ```xml
@@ -253,7 +291,7 @@ class BlockName extends \Magento\Framework\View\Element\Template
 </config>
 ```
 
-> id — идентификатор меню (в формате: {Vendor_ModuleName}::{menu_description});   
+> id — идентификатор меню (в формате: {Vendor_ModuleName}::{menu_description});
 title — это текст, который будет отображаться в строке меню;  
 module — определяет модуль, которому принадлежит это меню;  
 sortOrder — определяет положение меню. Нижнее значение будет отображаться в верхней части меню;  
@@ -262,13 +300,13 @@ action — определять URL-адрес страницы, на котор
 resource — [правила доступа](#acl) (в формате: {Vendor_ModuleName}::{rule});
 
 <figure>
-	<img src="images/admin-menu.png" height="500">
+ <img src="images/admin-menu.png" height="500">
 </figure>
 
-###### 3.2.4.2 Конфигурации
+##### 3.2.4.2 Конфигурации {#admin-view-configuration}
 
 <figure>
-	<img src="images/configuration.png">
+ <img src="images/configuration.png">
 </figure>
 
 создадим `ModuleName/etc/adminhtml/system.xml` с содержимым:
@@ -336,9 +374,9 @@ resource - [права](#acl) которые должен иметь польз�
 $this->scopeConfig->getValue('sectionId/groupId/fieldId', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 ```
 
-#### 3.3 Controller
+### 3.3 Controller {#controller}
 
-##### 3.3.1 Создадим контроллер `ModuleName/Controller/ControllerName/Action.php` с содержимым:
+#### 3.3.1 Создадим контроллер `ModuleName/Controller/ControllerName/Action.php` с содержимым {#create-controller}
 
 ```php
 <?php
@@ -348,15 +386,15 @@ namespace Vendor\ModuleName\Controller\ControllerName;
 class Action extends \Magento\Framework\App\Action\Action
 {
     protected $_pageFactory; //для шаблона
-	protected $_modelnameFactory; //для модели
+ protected $_modelnameFactory; //для модели
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $pageFactory,
-		\Vendor\ModuleName\Model\ModelNameFactory $modelnameFactory
+  \Vendor\ModuleName\Model\ModelNameFactory $modelnameFactory
     ) {
         $this->_pageFactory = $pageFactory;
-		$this->_modelnameFactory = $modelnameFactory;
+  $this->_modelnameFactory = $modelnameFactory;
         return parent::__construct($context);
     }
 
@@ -364,20 +402,20 @@ class Action extends \Magento\Framework\App\Action\Action
     {
         //ваш код
 
-		//для модели
-		//$modelData = $this->_modelnameFactory->create();
-		//$collection = $modelData->getCollection();
+        //для модели
+        //$modelData = $this->_modelnameFactory->create();
+        //$collection = $modelData->getCollection();
 
         //return $this->_pageFactory->create(); //для шаблона (view)
     }
 }
 ```
 
-### 4. Действия с Базой Данных
+## 4. Действия с Базой Данных {#db-actions}
 
-#### 4.1 Создание таблицы 
+### 4.1 Создание таблицы {#db-create-table}
 
-+ В файле `ModuleName/Setup/InstallSchema.php` распишем структуру таблицы: 
+* В файле `ModuleName/Setup/InstallSchema.php` распишем структуру таблицы:
 
 ```php
 <?php
@@ -386,45 +424,45 @@ namespace Vendor\ModuleName\Setup;
 class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
 {
 
-	public function install(\Magento\Framework\Setup\SchemaSetupInterface $setup, \Magento\Framework\Setup\ModuleContextInterface $context)
-	{
-		$installer = $setup;
-		$installer->startSetup();
-		if (!$installer->tableExists('vendor_modulename_tablename')) {
-			$table = $installer->getConnection()->newTable(
-				$installer->getTable('vendor_modulename_tablename')
-			)
-				->addColumn(
-					'pk_id',
-					\Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
-					null,
-					[
-						'identity' => true,
-						'nullable' => false,
-						'primary'  => true,
-						'unsigned' => true,
-					],
-					'PK ID'
-				)
+ public function install(\Magento\Framework\Setup\SchemaSetupInterface $setup, \Magento\Framework\Setup\ModuleContextInterface $context)
+ {
+  $installer = $setup;
+  $installer->startSetup();
+  if (!$installer->tableExists('vendor_modulename_tablename')) {
+   $table = $installer->getConnection()->newTable(
+    $installer->getTable('vendor_modulename_tablename')
+   )
+    ->addColumn(
+     'pk_id',
+     \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+     null,
+     [
+      'identity' => true,
+      'nullable' => false,
+      'primary'  => true,
+      'unsigned' => true,
+     ],
+     'PK ID'
+    )
                 ->addColumn(
-					'name',
-					\Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-					255,
-					['nullable => false'],
-					'Name'
-				);
+     'name',
+     \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+     255,
+     ['nullable => false'],
+     'Name'
+    );
 
-			$installer->getConnection()->createTable($table);
-		}
+   $installer->getConnection()->createTable($table);
+  }
 
-		$installer->endSetup();
-	}
+  $installer->endSetup();
+ }
 }
 ```
 
-#### 4.2 Изменение структуры таблицы 
+### 4.2 Изменение структуры таблицы {#db-edit-table}
 
-+ В файле `ModuleName/Setup/UpgradeSchema.php` распишем структуру таблицы: 
+* В файле `ModuleName/Setup/UpgradeSchema.php` распишем структуру таблицы:
 
 ```php
 <?php
@@ -436,52 +474,52 @@ use Magento\Framework\Setup\ModuleContextInterface;
 
 class UpgradeSchema implements UpgradeSchemaInterface
 {
-	public function upgrade( SchemaSetupInterface $setup, ModuleContextInterface $context ) {
-		$installer = $setup;
+ public function upgrade( SchemaSetupInterface $setup, ModuleContextInterface $context ) {
+  $installer = $setup;
 
-		$installer->startSetup();
+  $installer->startSetup();
 
-		if(version_compare($context->getVersion(), '1.1.0', '<')) {
-			if (!$installer->tableExists('vendor_modulename_tablename')) {
-				$table = $installer->getConnection()->newTable(
-					$installer->getTable('vendor_modulename_tablename')
-				)
-					->addColumn(
-						'pk_id',
-						\Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
-						null,
-						[
-							'identity' => true,
-							'nullable' => false,
-							'primary'  => true,
-							'unsigned' => true,
-						],
-						'PK ID'
-					)
-					->addColumn(
-						'name',
-						\Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-						255,
-						['nullable => false'],
-						'Name'
-					);
+  if(version_compare($context->getVersion(), '1.1.0', '<')) {
+   if (!$installer->tableExists('vendor_modulename_tablename')) {
+    $table = $installer->getConnection()->newTable(
+     $installer->getTable('vendor_modulename_tablename')
+    )
+     ->addColumn(
+      'pk_id',
+      \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+      null,
+      [
+       'identity' => true,
+       'nullable' => false,
+       'primary'  => true,
+       'unsigned' => true,
+      ],
+      'PK ID'
+     )
+     ->addColumn(
+      'name',
+      \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+      255,
+      ['nullable => false'],
+      'Name'
+     );
 
-				$installer->getConnection()->createTable($table);
-			}
-		}
+    $installer->getConnection()->createTable($table);
+   }
+  }
 
-		$installer->endSetup();
-	}
+  $installer->endSetup();
+ }
 }
 ```
 
 > тут идет сравнение c прошлой [версией модуля](#module-config)
 
->  При каждом обновлений структуры базы данных нужно запускать команду `php bin/magento setup:upgrade`
+> При каждом обновлений структуры базы данных нужно запускать команду `php bin/magento setup:upgrade`
 
-<h3 id="acl">5. Admin ACL (Access Control Lists - Списки контроля доступа)</h3>
+## 5. Admin ACL (Access Control Lists - Списки контроля доступа) {#acl}
 
-#### 5.1 создадим `ModuleName/etc/acl.xml` с содержимым:
+### 5.1 создадим `ModuleName/etc/acl.xml` с содержимым
 
 ```xml
 <?xml version="1.0"?>
@@ -500,5 +538,5 @@ class UpgradeSchema implements UpgradeSchemaInterface
 ```
 
 <figure>
-	<img src="images/acl.png" height="500">
+ <img src="images/acl.png" height="500">
 </figure>
