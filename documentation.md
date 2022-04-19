@@ -2,8 +2,8 @@
 
 ## Содержание
 
-1 - [Регистрация модуля](#module-registration)
-2 - [Роутинг](#routing)
+1 - [Регистрация модуля](#module-registration)  
+2 - [Роутинг](#routing)  
 3 - [MVC](#mvc)
 
 * 3.1 - [Model](#model-in-mvc)
@@ -79,7 +79,7 @@ Cсылка делится на три составных элемента:
 `http://magento2.com/route_name/controller/action`  
 
 `route_name` - название роута ([frontName](#register-route) в **routes.xml**);  
-`controller` - папка в каталоге **Controller**;
+`controller` - папка в каталоге **Controller**;  
 `action` - php класс с методом **execute**;
 
 <h3 id="register-route">2.1 Регистрация роута</h3>
@@ -97,9 +97,9 @@ Cсылка делится на три составных элемента:
 </config>
 ```
 
-router `id` -
-route `frontName` - название роута в адресной строке;
-route `id` - идентификатор роута(применяется в [шаблоне](#create-layout));
+router `id` -  
+route `frontName` - название роута в адресной строке;  
+route `id` - идентификатор роута(применяется в [шаблоне](#create-layout));  
 module `name` - название модуля;
 
 <h2 id="mvc">3. MVC</h2>
@@ -291,7 +291,7 @@ class BlockName extends \Magento\Framework\View\Element\Template
 </config>
 ```
 
-> id — идентификатор меню (в формате: {Vendor_ModuleName}::{menu_description});
+> id — идентификатор меню (в формате: {Vendor_ModuleName}::{menu_description});  
 title — это текст, который будет отображаться в строке меню;  
 module — определяет модуль, которому принадлежит это меню;  
 sortOrder — определяет положение меню. Нижнее значение будет отображаться в верхней части меню;  
