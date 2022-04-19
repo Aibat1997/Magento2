@@ -34,7 +34,7 @@
 `app/code/Vendor/Module_Name` — название модуля.  
 `app/code/Vendor/Module_Name/etc` — содержит файлы конфигурации.
 
-## 1. Регистрация модуля {#module-registration}
+<h2 id="module-registration">1. Регистрация модуля</h2>
 
 ### 1.1 Создаем файл `Module_Name/etc/module.xml` с содержимым: {#module-config}
 
