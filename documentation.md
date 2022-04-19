@@ -36,7 +36,7 @@
 
 <h2 id="module-registration">1. Регистрация модуля</h2>
 
-### 1.1 Создаем файл `Module_Name/etc/module.xml` с содержимым: {#module-config}
+<h3 id="module-config">1.1 Создаем файл <code>Module_Name/etc/module.xml</code> с содержимым:</h3>
 
 ```xml
 <?xml version="1.0"?>
@@ -61,7 +61,7 @@
 
 > Заменяем Vendor_ModuleName на нужное нам название (название производителя_название модуля).
 
-### 1.3 Запускаем модуль {#run-module}
+<h3 id="run-module">1.3 Запускаем модуль</h3>
 
 * Проверяем корректно ли был создан модуль, запускаем команду:  
 `php bin/magento module:status`
@@ -73,7 +73,7 @@
 * Обновим структуры базы данных:
 `php bin/magento setup:upgrade`
 
-## 2. Роутинг {#routing}
+<h2 id="routing">2. Роутинг</h2>
 
 Cсылка делится на три составных элемента:  
 `http://magento2.com/route_name/controller/action`  
@@ -82,9 +82,9 @@ Cсылка делится на три составных элемента:
 `controller` - папка в каталоге **Controller**;
 `action` - php класс с методом **execute**;
 
-### 2.1 Регистрация роута {#register-route}  
+<h3 id="register-route">2.1 Регистрация роута</h3>
 
-#### 2.1.1 Создаем файл `Module_Name/etc/frontend/routes.xml` с содержимым: {#create-route}
+<h4 id="create-route">2.1.1 Создаем файл <code>Module_Name/etc/frontend/routes.xml</code> с содержимым:</h4>
 
 ```xml
 <?xml version="1.0" ?>
@@ -102,9 +102,9 @@ route `frontName` - название роута в адресной строке
 route `id` - идентификатор роута(применяется в [шаблоне](#create-layout));
 module `name` - название модуля;
 
-## 3. MVC {#mvc}
+<h2 id="mvc">3. MVC</h2>
 
-### 3.1 Model {#model-in-mvc}
+<h3 id="model-in-mvc">3.1 Model</h3>
 
 В Magento2 модель разделена на три части, это:
 
@@ -112,7 +112,7 @@ module `name` - название модуля;
 * **Model** - содержит бизнес-логику модели;
 * **Collection** - для фильтрования и сортировки данных модели;
 
-#### 3.1.1 Создадим модель ресурсов в `ModuleName/Model/ResourceModel/ResourceModelName.php` с содержимым: {#resource-model}
+<h4 id="resource-model">3.1.1 Создадим модель ресурсов в <code>ModuleName/Model/ResourceModel/ResourceModelName.php</code> с содержимым:</h4>
 
 ```php
 <?php
@@ -139,7 +139,7 @@ class ResourceModelName extends \Magento\Framework\Model\ResourceModel\Db\Abstra
 
 > Все фактические операции с базой данных выполняются моделью ресурсов. Каждая модель должна иметь модель ресурсов.
 
-#### 3.1.2 Создадим модель в `ModuleName/Model/ModelName.php` с содержимым: {#model}
+<h4 id="model">3.1.2 Создадим модель в <code>ModuleName/Model/ModelName.php</code> с содержимым:</h4>
 
 ```php
 <?php
@@ -175,7 +175,7 @@ class ModelName extends \Magento\Framework\Model\AbstractModel implements \Magen
 
 > метод _init() определяет [модель ресурсов](#resource-model), которая фактически будет извлекать информацию из базы данных.
 
-#### 3.1.3 Создадим модель коллекции в `ModuleName/Model/ResourceModel/ModelName/Collection.php` с содержимым {#model-collection}
+<h4 id="model-collection">3.1.3 Создадим модель коллекции в <code>ModuleName/Model/ResourceModel/ModelName/Collection.php</code> с содержимым</h4>
 
 ```php
 <?php
@@ -203,7 +203,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
 
 > метод _init() определяет [модель](#model) и [модель ресурсов](#resource-model)
 
-### 3.2 View {#view}
+<h3 id="view">3.2 View</h3>
 
 Состоит из трех компонентов (подробнее [здесь](https://devdocs.magento.com/guides/v2.3/frontend-dev-guide/layouts/layout-overview.html))
 
@@ -211,7 +211,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
 * Containers - секции для заполнения контентом;
 * Blocks - элементы пользовательского интерфейса на странице.
 
-#### 3.2.1 Создадим макет страницы в `ModuleName/view/area/layout/helloworld_index_index.xml` с содержимым: {#create-layout}
+<h4 id="create-layout">3.2.1 Создадим макет страницы в <code>ModuleName/view/area/layout/helloworld_index_index.xml</code> с содержимым:</h4>
 
 > структура расположения макета `module_name`/view/`area`/layout, где:
 >
@@ -234,7 +234,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
 > block `name` - идентификатор блока;  
 > block `template` - название [шаблона](#create-template);
 
-#### 3.2.2 Создадим блок файл в `ModuleName/Block/BlockName.php` с содержимым: {#create-block}
+<h4 id="create-block">3.2.2 Создадим блок файл в <code>ModuleName/Block/BlockName.php</code> с содержимым:</h4>
 
 ```php
 <?php
@@ -261,7 +261,7 @@ class BlockName extends \Magento\Framework\View\Element\Template
 }
 ```
 
-#### 3.2.3 Создадим файл шаблона в `ModuleName/view/area/templates/templateName.phtml` с содержимым: {#create-template}
+<h4 id="create-template">3.2.3 Создадим файл шаблона в <code>ModuleName/view/area/templates/templateName.phtml</code> с содержимым:</h4>
 
 ```php
 <ul>
@@ -275,9 +275,9 @@ class BlockName extends \Magento\Framework\View\Element\Template
 
  > $block - переменная для использования данных с класса [блока](#create-block);
 
-#### 3.2.4 Админ панель {#admin-panel}
+<h4 id="admin-panel">3.2.4 Админ панель</h4>
 
-##### 3.2.4.1 Меню {#admin-view-menu}
+<h5 id="admin-view-menu">3.2.4.1 Меню</h5>
 
 создадим `ModuleName/etc/adminhtml/menu.xml` с содержимым:
 
@@ -303,7 +303,7 @@ resource — [правила доступа](#acl) (в формате: {Vendor_M
  <img src="images/admin-menu.png" height="500">
 </figure>
 
-##### 3.2.4.2 Конфигурации {#admin-view-configuration}
+<h5 id="admin-view-configuration">3.2.4.2 Конфигурации</h5>
 
 <figure>
  <img src="images/configuration.png">
@@ -374,9 +374,9 @@ resource - [права](#acl) которые должен иметь польз�
 $this->scopeConfig->getValue('sectionId/groupId/fieldId', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 ```
 
-### 3.3 Controller {#controller}
+<h3 id="controller">3.3 Controller</h3>
 
-#### 3.3.1 Создадим контроллер `ModuleName/Controller/ControllerName/Action.php` с содержимым {#create-controller}
+<h4 id="create-controller">3.3.1 Создадим контроллер <code>ModuleName/Controller/ControllerName/Action.php</code> с содержимым</h4>
 
 ```php
 <?php
@@ -411,9 +411,9 @@ class Action extends \Magento\Framework\App\Action\Action
 }
 ```
 
-## 4. Действия с Базой Данных {#db-actions}
+<h2 id="db-actions">4. Действия с Базой Данных</h2>
 
-### 4.1 Создание таблицы {#db-create-table}
+<h3 id="db-create-table">4.1 Создание таблицы</h3>
 
 * В файле `ModuleName/Setup/InstallSchema.php` распишем структуру таблицы:
 
@@ -460,7 +460,7 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
 }
 ```
 
-### 4.2 Изменение структуры таблицы {#db-edit-table}
+<h3 id="db-edit-table">4.2 Изменение структуры таблицы</h3>
 
 * В файле `ModuleName/Setup/UpgradeSchema.php` распишем структуру таблицы:
 
@@ -517,7 +517,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
 > При каждом обновлений структуры базы данных нужно запускать команду `php bin/magento setup:upgrade`
 
-## 5. Admin ACL (Access Control Lists - Списки контроля доступа) {#acl}
+<h2 id="acl">5. Admin ACL (Access Control Lists - Списки контроля доступа)</h2>
 
 ### 5.1 создадим `ModuleName/etc/acl.xml` с содержимым
 
